@@ -32,7 +32,7 @@ static int tx_status_handler(xbee_dev_t *xbee, const void FAR *frame,
                              uint16_t length, void FAR *context);
 
 
-// There are more robust status and receive handlers defined in wpan.h
+// There are more robust receive handlers defined in wpan.h
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
     {XBEE_FRAME_RECEIVE_EXPLICIT, 0, receive_handler, NULL}, 
     XBEE_FRAME_TRANSMIT_STATUS_DEBUG,
@@ -41,17 +41,21 @@ const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
 
 xbee_serial_t init_serial()
 {
+    // Our constants
+    uint32_t BAUD_RATE = 115200;
+    char SOME_DEVICE_ID[40] = {'\0'}; // TODO: Wtf what the device?
+    
     // We want to start with a clean slate
     xbee_serial_t serial;
     memset(&serial, 0, sizeof serial);
-    uint32_t BAUD_RATE = 230400;
-    char SOME_DEVICE_ID[40] = {'\0'};
 
     // Set the baudrate and device ID. 
-    // TODO: Do we need to initialize the fd member of `serial`?
-    // TODO: What goes in device char array?
+    // TODO: In the parse_serial_args function, they look for a /dev/* line
+    // to "determine what serial port to use"  
+    // Q: Shuould there be two serial ports?
     serial.baudrate = BAUD_RATE;
     strncpy(serial.device, SOME_DEVICE_ID, (sizeof serial.device) - 1);
+    serial.device[(sizeof serial.device) - 1] = '\0';
 }
 
 int main(int argc, char **argv)
@@ -60,8 +64,6 @@ int main(int argc, char **argv)
     int const MAX_PAYLOAD_SIZE = 100;
     xbee_serial_t serial = init_serial();
     xbee_dev_t my_xbee;
-
-    // xbee_ipv4_envelope_t env;
 
     err = xbee_dev_init(&my_xbee, &serial, NULL, NULL);
     if (err)
@@ -86,13 +88,13 @@ int main(int argc, char **argv)
                strerror(-err));
         return EXIT_FAILURE;
     }
+    // -- END CMD INIT BLOCK
+    
 
     // Dump state to stdout for debug
     xbee_dev_dump_settings(&my_xbee, XBEE_DEV_DUMP_FLAG_DEFAULT); 
 
-    // The signal handler allows us to exit gracefully upon receiving SIGTERM
-    // or SIGINT, resetting the terminal color and completing any in-progress
-    // transmissions.
+    // Create graceful SIGINT handler
     if (signal(SIGTERM, sigterm) == SIG_ERR || signal(SIGINT, sigterm) == SIG_ERR)
     {
         printf("Error setting signal handler\n");
@@ -128,20 +130,21 @@ int main(int argc, char **argv)
         xbee_header_transmit_explicit_t frame_out_header = {
             // Static in all our frames 
             .frame_type = XBEE_FRAME_TRANSMIT_EXPLICIT,
+            .frame_id = frame_id,
+            .ieee_address = WPAN_IEEE_ADDR_BROADCAST,
+            .network_address_be = 0xFFFE, // Possibly wrong. Reserved?
             .source_endpoint = WPAN_ENDPOINT_DIGI_DATA, 
             .dest_endpoint = WPAN_ENDPOINT_DIGI_DATA, 
             .cluster_id_be = DIGI_CLUST_SERIAL,
             .profile_id_be = WPAN_PROFILE_DIGI,
-            .ieee_address = WPAN_IEEE_ADDR_BROADCAST,
             .broadcast_radius = 0x0,
             .options = 0x0, 
-            // (We haven't accounted for "resevered" field)
-            // Dynamic in our frames
-            .frame_id = frame_id,
         };
 
-        // We can place the entire frame data into the header?
-        err = xbee_frame_write(&my_xbee, &frame_out_header, sizeof frame_out_header, &payload, sizeof payload, 0);
+        // Write out the header & payload
+        err = xbee_frame_write(&my_xbee, &frame_out_header, 
+                    sizeof frame_out_header, &payload, sizeof payload, 0);
+                    
         if (err < 0)
         {
             printf("Error writing frame: %" PRIsFAR "\n", strerror(-err));

@@ -13,13 +13,9 @@ STRUCT NOTES
 *wpan_dev_t*
 The fundamental abstraction of a physical XBee. It's the layer between the ?? and the "networking layers." Here is where we store the device's settings (eg. max packet size).
 
-Q: Do we create the tick function?
-Q: Is this where baud rate is stored?
-
 *xbee_dev_t*
 A higher level abstraction of an XBee.
 
-Q: What use is this struct?
 
 *xbee_header_transmit_t*
 We'll indirectly create these structs to Transmit. The network stack does not contain way to create and send, so use 0x11 with special settings.
@@ -31,8 +27,6 @@ dest_endpoint = WPAN_ENDPOINT_DIGI_DATA
 cluster_id_be = DIGI_CLUST_SERIAL
 profile_id_be = WPAN_PROFILE_DIGI
 broadcast_radius = 0x0 
-
-Q: How can we make these?
 
 *xbee_frame_transmit_status_t*
 We'll receive these structs after transmitting. Contains some helpful info.
