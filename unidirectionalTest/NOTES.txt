@@ -1,0 +1,74 @@
+Includes are found in "libraries/include"
+
+http://digidotcom.github.io/xbee_ansic_library/group__xbee__device.html#gga7753bbebaf00d6d64942f64b6ae9b7b9ab6fa3650abecfac4645c5d4ccdf857fd
+
+This whole library is function-based. Order of steps:
+1) Create a wpan_dev_t
+2) Create a xbee_dev_t
+3) Manage with functions in wpan
+
+
+STRUCT NOTES
+------------
+*wpan_dev_t*
+The fundamental abstraction of a physical XBee. It's the layer between the ?? and the "networking layers." Here is where we store the device's settings (eg. max packet size).
+
+Q: Do we create the tick function?
+Q: Is this where baud rate is stored?
+
+*xbee_dev_t*
+A higher level abstraction of an XBee.
+
+Q: What use is this struct?
+
+*xbee_header_transmit_t*
+We'll indirectly create these structs to Transmit. The network stack does not contain way to create and send, so use 0x11 with special settings.
+
+*xbee_header_transmit_explicit_t*
+Although we aren't bothing to be explicit, we'll use this. So apply the special settings to each:
+source_endpoint = WPAN_ENDPOINT_DIGI_DATA 
+dest_endpoint = WPAN_ENDPOINT_DIGI_DATA 
+cluster_id_be = DIGI_CLUST_SERIAL
+profile_id_be = WPAN_PROFILE_DIGI
+broadcast_radius = 0x0 
+
+Q: How can we make these?
+
+*xbee_frame_transmit_status_t*
+We'll receive these structs after transmitting. Contains some helpful info.
+
+Q: Where can we write our function for processing these?
+
+*xbee_frame_receive_t*
+We'll receive these structs after reading an in-bound frame.
+
+
+
+FUNCTION NOTES
+--------------
+*xbee_dev_init(...)*
+Initialize an xbee_dev_t struct. This opens the serial port connection (ie. GPIO). 
+
+*xbee_dev_tick(...)*
+Reads the serial buffer of an xbee to grab any new frames. Automatically calls `_xbee_frame_dispatch` to dispatch frames by type. This means we need to write handlers for the dispatcher to pass the frames to. Returns the number of read frames. NOT re-entrant, so caution with multithreading.
+
+*xbee_frame_write(...)*
+Copies a frame into the outgoing serial buffer of the xbee_dev_t. We'll have needed to construct the frame ahead of time.
+
+frame_typed.md
+ - Definition locations for all frames
+
+xbee/serial.h
+ - Maps upper level serial API to devices native API
+ - But does this work on pi?
+ 
+xbee/delivery_status.h
+ - Delivery status codes
+
+xbee/wpan.h
+ - 0x10 Transmit Request defintion
+ - 0x90 Received Data defintion
+ - 0x8B Transmit Status
+ - _xbee_handle_transmit_status // Dummy handler
+
+
