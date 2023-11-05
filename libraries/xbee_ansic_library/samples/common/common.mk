@@ -66,9 +66,6 @@ zcltime : zcltime.o
 
 eblinfo : eblinfo.o xbee_ebl_file.o swapbytes.o
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
-	
-my_transmitter : $(wpan_OBJECTS) my_transmitter.o
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 SRCS = \
 	$(wildcard $(SRCDIR)/*/*.c) \
@@ -216,6 +213,10 @@ commissioning_server_OBJECTS = $(zigbee_OBJECTS) \
 	zcl_client.o zcl_identify.o xbee_time.o
 
 commissioning_server : $(commissioning_server_OBJECTS)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	
+my_transmitter_OBJECTS = $(zigbee_OBJECTS) $(atinter_OBJECTS) my_transmitter.o
+my_transmitter : $(my_transmitter_OBJECTS)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 # Use the dependency files created by the -MD option to gcc.

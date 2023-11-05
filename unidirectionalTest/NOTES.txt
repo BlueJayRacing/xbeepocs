@@ -66,3 +66,7 @@ xbee/wpan.h
  - _xbee_handle_transmit_status // Dummy handler
 
 
+HAL LAYER NOTES
+---------------
+"To access your serial ports, reference /dev/ttySXXX where XXX is the COM port number minus 1 (e.g., COM31 is /dev/ttyS30)."
+

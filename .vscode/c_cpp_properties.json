@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/libraries/xbee_ansic_library/include",
-                "/home/pi/xbeepocs/libraries/xbee_ansic_library/ports/posix"
+                "${workspaceFolder}/libraries/xbee_ansic_library/ports/posix"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
