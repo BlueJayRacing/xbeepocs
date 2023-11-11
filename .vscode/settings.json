@@ -50,7 +50,9 @@
     "cinttypes": "cpp",
     "typeinfo": "cpp",
     "ebl_file.h": "c",
-    "_xbee_term.h": "c"
+    "_xbee_term.h": "c",
+    "platform_config.h": "c",
+    "strings.h": "c"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }

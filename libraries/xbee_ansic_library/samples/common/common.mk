@@ -19,7 +19,6 @@ SRCDIR = $(DRIVER)/src
 
 # extra defines (in addition to those in platform_config.h)
 DEFINE += \
-	-DXBEE_PLATFORM_HEADER='"$(PORTDIR)/platform_config.h"' \
 	-DZCL_ENABLE_TIME_SERVER \
 	-DXBEE_CELLULAR_ENABLED \
 	-DXBEE_DEVICE_ENABLE_ATMODE \

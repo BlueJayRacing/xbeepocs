@@ -1,5 +1,3 @@
-// Goal: Parse this down! We want an IPV4 free verison
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,7 +6,7 @@
 #include "xbee/device.h"
 #include "xbee/atcmd.h"
 #include "xbee/wpan.h"
-#include "../../ports/posix/platform_config.h"
+#include "platform_config.h"
 
 uint32_t BAUD_RATE = 115200;
 char SERIAL_DEVICE_ID[] = "/dev/ttyS0";
