@@ -53,6 +53,7 @@ src/xbee/util
 doc
 lib
 coverity
+vscode/
 
 # auto-generated files
 samples/rabbit/main-node_discovery.c

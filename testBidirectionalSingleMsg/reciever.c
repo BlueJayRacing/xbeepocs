@@ -11,8 +11,9 @@
 
 uint32_t BAUD_RATE = 115200;
 char SERIAL_DEVICE_ID[] = "/dev/ttyS0";
-int const MAX_PAYLOAD_SIZE = 100;
 char TEST_MESSAGES_SRC[] = "random_text.txt";
+int const MAX_PAYLOAD_SIZE = 100;
+int const NUM_EXPECTED_MESSAGES = 50;
 
 // Local Functions
 xbee_serial_t init_serial();
@@ -26,7 +27,6 @@ static int receive_handler(xbee_dev_t *xbee, const void FAR *raw,
 static volatile sig_atomic_t terminationflag = 0;
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
     {XBEE_FRAME_RECEIVE_EXPLICIT, 0, receive_handler, NULL},
-    {XBEE_FRAME_TRANSMIT_STATUS, 0, tx_status_handler, NULL},
     XBEE_FRAME_HANDLE_LOCAL_AT,
     XBEE_FRAME_TABLE_END};
 
@@ -53,44 +53,34 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
-  xbee_header_transmit_explicit_t frame_out_header = {
-      .frame_type = XBEE_FRAME_TRANSMIT_EXPLICIT,
-      .frame_id = 0,
-      .ieee_address = *WPAN_IEEE_ADDR_BROADCAST,
-      .network_address_be = 0xFFFE, // Possibly wrong. Reserved?
-      .source_endpoint = WPAN_ENDPOINT_DIGI_DATA,
-      .dest_endpoint = WPAN_ENDPOINT_DIGI_DATA,
-      .cluster_id_be = DIGI_CLUST_SERIAL,
-      .profile_id_be = WPAN_PROFILE_DIGI,
-      .broadcast_radius = 0x0,
-      .options = 0x0,
-  };
-
-  // Arbitrary messages
-  FILE *messages = fopen(TEST_MESSAGES_SRC, "r");
-  if (messages == NULL)
+  // Read in the expected messages, store as an array of pointers to null
+  // terminated strings.
+  FILE *msg_file = fopen(TEST_MESSAGES_SRC, "r");
+  if (msg_file == NULL)
   {
     printf("Error opening %s\n", TEST_MESSAGES_SRC);
     return EXIT_FAILURE;
   }
 
-  // Send messages & tick XBEE
-  int frame_id = 0;
-  char payload[MAX_PAYLOAD_SIZE + 1];
-  while (fgets(payload, MAX_PAYLOAD_SIZE + 1, messages) != NULL)
+  // Get array of expected messages
+  char* expected_msgs[NUM_EXPECTED_MESSAGES];
+  int err = get_expected_messages(expected_msgs,
+                                             NUM_EXPECTED_MESSAGES, msg_file);
+  if (err != NUM_EXPECTED_MESSAGES)
   {
-    // Send the next message, but don't forget to update the header
-    frame_id++;
-    printf("Sending message number: %d\n", frame_id);
-    frame_out_header.frame_id = frame_id;
-    err = xbee_frame_write(&my_xbee, &frame_out_header,
-                           sizeof frame_out_header, &payload, sizeof payload, 0);
-    if (err < 0)
-    {
-      printf("Error writing frame: %" PRIsFAR "\n", strerror(-err));
-    }
+    printf("Could not read all expected messages from file source");
+    return EXIT_FAILURE;
+  }
+  
+  // Get array of expected messages
+  char* recieved_msgs[NUM_EXPECTED_MESSAGES];
 
-    usleep(100000);
+  // Send messages & tick XBEE
+  int n_recieved = 0;
+  char payload[MAX_PAYLOAD_SIZE + 1];
+  while (length(recieved_messages) < NUM_EXPECTED_MESSAGES)
+  {
+    usleep(10000);
     // Tick to get TX status updates
     err = xbee_dev_tick(&my_xbee);
     if (terminationflag)
@@ -105,9 +95,8 @@ int main(int argc, char **argv)
     }
   }
 
-  // Cleanup
+  // Clean up the device
   usleep(1000000);
-  fclose(messages);
   err = xbee_dev_tick(&my_xbee);
   if (err < 0)
   {
@@ -119,6 +108,13 @@ int main(int argc, char **argv)
   printf("\n");
   printf("Could not read more from message source.\n");
   printf("Sent %d messages!\n", frame_id);
+
+  // Cleanup
+  for (int i = 0; i < NUM_EXPECTED_MESSAGES, i++)
+  {
+    free(expected_msgs[i]);
+  }
+  
 }
 
 static int receive_handler(xbee_dev_t *xbee, const void FAR *raw,
@@ -132,15 +128,28 @@ static int receive_handler(xbee_dev_t *xbee, const void FAR *raw,
   return 0;
 }
 
-int tx_status_handler(xbee_dev_t *xbee,
-                      const void FAR *raw, uint16_t length, void FAR *context)
+static int get_expected_messages(
+    char *messages[], int max_num_messages, FILE *src)
 {
-  const xbee_frame_transmit_status_t FAR *frame = raw;
-  XBEE_UNUSED_PARAMETER(xbee);
-  XBEE_UNUSED_PARAMETER(length);
-  XBEE_UNUSED_PARAMETER(context);
-  printf("TX Status: id %d, delivery=0x%02x\n", frame->frame_id, frame->delivery);
-  return 0;
+  // Read up to max_num_messages, returning the actual number of messages
+  // read from the file.
+
+  // Dyn allocate an array of char* with length num_msgs
+
+  for (int i = 0; i < num_msgs, i++)
+  {
+    char msg[MAX_PAYLOAD_SIZE + 1];
+    if (fgets(msg, MAX_PAYLOAD_SIZE + 1, src) != NULL)
+    {
+      return NULL;
+    }
+
+    // Copy msg into the dynmically allocated destination
+    messages[i] = malloc(strlen(msg) + 1);
+    strcpy(messages[i], msg);
+  }
+
+  return messages;
 }
 
 static void sigterm(int sig)
