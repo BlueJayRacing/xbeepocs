@@ -32,12 +32,11 @@ const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
 
 int main(int argc, char **argv)
 {
-  int err;
   xbee_serial_t serial = init_serial();
   xbee_dev_t my_xbee;
 
   // Dump state to stdout for debug
-  err = xbee_dev_init(&my_xbee, &serial, NULL, NULL);
+  int err = xbee_dev_init(&my_xbee, &serial, NULL, NULL);
   if (err)
   {
     printf("Error initializing device: %" PRIsFAR "\n", strerror(-err));
@@ -72,13 +71,11 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
   
-  // Get array of expected messages
+  // Tick Xbee to search for recieved messages
   char* recieved_msgs[NUM_EXPECTED_MESSAGES];
-
-  // Send messages & tick XBEE
   int n_recieved = 0;
   char payload[MAX_PAYLOAD_SIZE + 1];
-  while (length(recieved_messages) < NUM_EXPECTED_MESSAGES)
+  while (length(n_recieved) < NUM_EXPECTED_MESSAGES)
   {
     usleep(10000);
     // Tick to get TX status updates
@@ -105,16 +102,18 @@ int main(int argc, char **argv)
   }
 
   // Summary
-  printf("\n");
-  printf("Could not read more from message source.\n");
-  printf("Sent %d messages!\n", frame_id);
+  // TODO: Print out number expected, number recieved
 
   // Cleanup
   for (int i = 0; i < NUM_EXPECTED_MESSAGES, i++)
   {
-    free(expected_msgs[i]);
+    if (expected_msgs[i] != NULL) {
+      free(expected_msgs[i]);
+    }
+    if (recieved_msgs[i]) {
+      free(recieved_msgs[i]);
+    }
   }
-  
 }
 
 static int receive_handler(xbee_dev_t *xbee, const void FAR *raw,
@@ -132,24 +131,21 @@ static int get_expected_messages(
     char *messages[], int max_num_messages, FILE *src)
 {
   // Read up to max_num_messages, returning the actual number of messages
-  // read from the file.
+  // read from the file. Fill messages with pointers to the strings read
+  // from the file.
 
   // Dyn allocate an array of char* with length num_msgs
-
-  for (int i = 0; i < num_msgs, i++)
+  for (int i = 0; i < max_num_messages; i++)
   {
     char msg[MAX_PAYLOAD_SIZE + 1];
-    if (fgets(msg, MAX_PAYLOAD_SIZE + 1, src) != NULL)
+    if (fgets(msg, MAX_PAYLOAD_SIZE + 1, src) == NULL)
     {
-      return NULL;
+      return i;
     }
-
-    // Copy msg into the dynmically allocated destination
     messages[i] = malloc(strlen(msg) + 1);
     strcpy(messages[i], msg);
   }
-
-  return messages;
+  return max_num_messages;
 }
 
 static void sigterm(int sig)
