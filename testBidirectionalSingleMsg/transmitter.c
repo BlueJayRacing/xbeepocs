@@ -76,8 +76,8 @@ int main(int argc, char **argv)
 
   // Send messages & tick XBEE
   int frame_id = 0;
-  char payload[MAX_PAYLOAD_SIZE + 1];
-  while (fgets(payload, MAX_PAYLOAD_SIZE + 1, messages) != NULL)
+  char payload[MAX_PAYLOAD_SIZE];
+  while (fgets(payload, MAX_PAYLOAD_SIZE, messages) != NULL)
   {
     // Send the next message, but don't forget to update the header
     frame_id++;
