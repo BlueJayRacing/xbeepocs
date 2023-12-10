@@ -55,6 +55,7 @@ int main(int argc, char **argv)
     printf("Error setting signal handler\n");
     return EXIT_FAILURE;
   }
+  printf("Set SIGINT handler\n");
 
   // Get array of expected messages
   err = get_expected_messages(expected_msgs, NUM_EXPECTED_MESSAGES);
@@ -63,9 +64,10 @@ int main(int argc, char **argv)
     printf("Could not read all expected messages from file source");
     return EXIT_FAILURE;
   }
+  printf("Loaded expected messages from file\n");
   
   // Tick Xbee to search for recieved messages
-  printf("Beggining to wait & tick for messages...");
+  printf("Beggining to wait & tick for messages...\n");
   while (num_msgs_rx < NUM_EXPECTED_MESSAGES)
   {
     usleep(10000);
@@ -93,10 +95,10 @@ int main(int argc, char **argv)
   }
 
   // Summary
-  printf("Expected number of messages: %d", NUM_EXPECTED_MESSAGES);
-  printf("Number of messages recieved: %d", num_msgs_rx);
+  printf("\nExpected number of messages: %d\n", NUM_EXPECTED_MESSAGES);
+  printf("Number of messages recieved: %d\n\n", num_msgs_rx);
 
-  // Cleanup
+  // Cleanup Allocations
   for (int i = 0; i < NUM_EXPECTED_MESSAGES; i++)
   {
     if (expected_msgs[i] != NULL) {
@@ -106,6 +108,7 @@ int main(int argc, char **argv)
       free(recieved_msgs[i]);
     }
   }
+  printf("Finished clean up\n");
 }
 
 static int receive_handler(xbee_dev_t *xbee, const void FAR *raw,

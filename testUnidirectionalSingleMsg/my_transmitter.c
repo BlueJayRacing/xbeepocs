@@ -15,14 +15,13 @@ int const MAX_PAYLOAD_SIZE = 100;
 // Local Functions
 xbee_serial_t init_serial();
 static void sigterm(int sig);
-static int receive_handler(xbee_dev_t *xbee, const void FAR *frame,
-                           uint16_t length, void FAR *context);
+static int tx_status_handler(xbee_dev_t *xbee, const void FAR *raw,
+                      uint16_t length, void FAR *context);                        
 
 // Shared Variables. NOTE: There are better receive handlers in wpan.h
 static volatile sig_atomic_t terminationflag = 0;
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
-    {XBEE_FRAME_RECEIVE_EXPLICIT, 0, receive_handler, NULL},
-    XBEE_FRAME_TRANSMIT_STATUS_DEBUG,
+    {XBEE_FRAME_TRANSMIT_STATUS, 0, tx_status_handler, NULL},
     XBEE_FRAME_HANDLE_LOCAL_AT,
     XBEE_FRAME_TABLE_END};
 
@@ -101,15 +100,15 @@ int main(int argc, char **argv)
     }
 }
 
-static int receive_handler(xbee_dev_t *xbee, const void FAR *raw,
-                           uint16_t frame_len, void FAR *context)
+int tx_status_handler(xbee_dev_t *xbee,
+                      const void FAR *raw, uint16_t length, void FAR *context)
 {
-    const xbee_frame_receive_explicit_t FAR *frame_in = raw;
-    XBEE_UNUSED_PARAMETER(xbee);
-    XBEE_UNUSED_PARAMETER(frame_len);
-    XBEE_UNUSED_PARAMETER(frame_in);
-    XBEE_UNUSED_PARAMETER(context); // Will never use context
-    return 0;
+  const xbee_frame_transmit_status_t FAR *frame = raw;
+  XBEE_UNUSED_PARAMETER(xbee);
+  XBEE_UNUSED_PARAMETER(length);
+  XBEE_UNUSED_PARAMETER(context);
+  printf("TX Status: id %d, delivery=0x%02x\n", frame->frame_id, frame->delivery);
+  return 0;
 }
 
 static void sigterm(int sig)
