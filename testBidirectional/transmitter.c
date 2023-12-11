@@ -43,13 +43,28 @@ int main(int argc, char **argv)
     printf("Error initializing abstraction: %" PRIsFAR "\n", strerror(-err));
     return EXIT_FAILURE;
   }
-  printf("Initialized XBee device abstraction...\n");
+  printf("Initialized XBee device abstraction.\n");
+  
+  
+  // Need to initialize AT layer so we can transmit
   err = xbee_cmd_init_device(&my_xbee);
   if (err)
   {
     printf("Error initializing AT layer: %" PRIsFAR "\n", strerror(-err));
     return EXIT_FAILURE;
   }
+  
+  printf( "Waiting for driver to query the XBee device...\n");
+  do {
+    xbee_dev_tick( &my_xbee);
+    err = xbee_cmd_query_status( &my_xbee);
+  } while (err == -EBUSY);
+  if (err)
+  {
+    printf( "Error %d waiting for query to complete.\n", err);
+  }
+  
+  printf("Initialized XBee AT layer...\n");
   xbee_dev_dump_settings(&my_xbee, XBEE_DEV_DUMP_FLAG_DEFAULT);
 
   // Create graceful SIGINT handler
@@ -59,11 +74,12 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
+  // Every outbound message is a broadcast frame
   xbee_header_transmit_explicit_t frame_out_header = {
       .frame_type = XBEE_FRAME_TRANSMIT_EXPLICIT,
       .frame_id = 0,
       .ieee_address = *WPAN_IEEE_ADDR_BROADCAST,
-      .network_address_be = 0xFFFE, // Possibly wrong. Reserved?
+      .network_address_be = 0xFFFE,
       .source_endpoint = WPAN_ENDPOINT_DIGI_DATA,
       .dest_endpoint = WPAN_ENDPOINT_DIGI_DATA,
       .cluster_id_be = DIGI_CLUST_SERIAL,
