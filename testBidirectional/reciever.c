@@ -47,12 +47,26 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
   printf("Initialized XBee device abstraction...\n");
+  
+  // Need to initialize AT layer so we can transmit
   err = xbee_cmd_init_device(&my_xbee);
   if (err)
   {
     printf("Error initializing AT layer: %" PRIsFAR "\n", strerror(-err));
     return EXIT_FAILURE;
   }
+  
+  printf( "Waiting for driver to query the XBee device...\n");
+  do {
+    xbee_dev_tick( &my_xbee);
+    err = xbee_cmd_query_status( &my_xbee);
+  } while (err == -EBUSY);
+  if (err)
+  {
+    printf( "Error %d waiting for query to complete.\n", err);
+  }
+  
+  printf("Initialized XBee AT layer...\n");
   xbee_dev_dump_settings(&my_xbee, XBEE_DEV_DUMP_FLAG_DEFAULT);
 
   // Create graceful SIGINT handler
