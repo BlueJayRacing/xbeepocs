@@ -43,10 +43,16 @@ int main(int argc, char **argv)
   int err = xbee_dev_init(&my_xbee, &serial, NULL, NULL);
   if (err)
   {
-    printf("Error initializing device: %" PRIsFAR "\n", strerror(-err));
+    printf("Error initializing abstraction: %" PRIsFAR "\n", strerror(-err));
     return EXIT_FAILURE;
   }
   printf("Initialized XBee device abstraction...\n");
+  err = xbee_cmd_init_device(&my_xbee);
+  if (err)
+  {
+    printf("Error initializing AT layer: %" PRIsFAR "\n", strerror(-err));
+    return EXIT_FAILURE;
+  }
   xbee_dev_dump_settings(&my_xbee, XBEE_DEV_DUMP_FLAG_DEFAULT);
 
   // Create graceful SIGINT handler
