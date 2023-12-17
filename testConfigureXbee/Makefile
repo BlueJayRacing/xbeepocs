@@ -49,12 +49,9 @@ wpan_OBJECTS = $(xbee_OBJECTS) wpan_aps.o xbee_wpan.o
 zigbee_OBJECTS = $(wpan_OBJECTS) zigbee_zcl.o zigbee_zdo.o zcl_types.o
 
 # The executables are the only explicit targets we need
-transmitter : transmitter.o $(zigbee_OBJECTS)
+configureXbee : transmitter.o $(zigbee_OBJECTS)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 	
-reciever : reciever.o $(zigbee_OBJECTS)
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
 # Use the dependency files created by the -MD option to gcc.
 -include $(SRCS:.c=.d)
 

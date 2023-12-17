@@ -6,5 +6,5 @@
 // 3. Initializing the AT layer
 // 4. Confirming that the XBee has the correct setting
 
-#include "xbee_baja_configs.h"
+#include "xbee_baja_config.h"
 

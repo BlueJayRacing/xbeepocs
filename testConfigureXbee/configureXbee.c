@@ -8,10 +8,11 @@
 #include "xbee/atcmd.h"
 #include "xbee/wpan.h"
 #include "platform_config.h"
+#include "serial_port_config.h"
+#include "xbee_baja_config.h"
 
 // Local Functions
 xbee_serial_t init_serial();
-static void sigterm(int sig);
 
 // Global variable. Should define in main.c
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
@@ -64,7 +65,7 @@ xbee_serial_t init_serial()
   memset(&serial, 0, sizeof serial);
 
   // Set the baudrate and device ID.
-  serial.baudrate = BAUD_RATE;
+  serial.baudrate = XBEE_BAJA_BD;
   strncpy(serial.device, SERIAL_DEVICE_ID, (sizeof serial.device));
   return serial;
 }
