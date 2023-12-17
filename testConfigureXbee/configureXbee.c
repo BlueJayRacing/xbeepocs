@@ -8,11 +8,7 @@
 #include "xbee/atcmd.h"
 #include "xbee/wpan.h"
 #include "platform_config.h"
-#include "serial_port_config.h"
-#include "xbee_baja_config.h"
-
-// Local Functions
-xbee_serial_t init_serial();
+#include "xbee_init_funcs.h"
 
 // Global variable. Should define in main.c
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
@@ -20,52 +16,16 @@ const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
 
 int main(int argc, char **argv)
 {
-  int err;
-  xbee_serial_t serial = init_serial();
+  
   xbee_dev_t my_xbee;
-
-  // Dump state to stdout for debug
-  err = xbee_dev_init(&my_xbee, &serial, NULL, NULL);
+  int err = init_baja_xbee();
   if (err)
   {
-    printf("Error initializing abstraction: %" PRIsFAR "\n", strerror(-err));
+    printf("Error initializing XBee with baja settings.\n");
     return EXIT_FAILURE;
   }
-  printf("Initialized XBee device abstraction.\n");
+  printf("Finished running initialization test\n");
   
-  
-  // Need to initialize AT layer so we can transmit
-  err = xbee_cmd_init_device(&my_xbee);
-  if (err)
-  {
-    printf("Error initializing AT layer: %" PRIsFAR "\n", strerror(-err));
-    return EXIT_FAILURE;
-  }
-  
-  printf( "Waiting for driver to query the XBee device...\n");
-  do {
-    xbee_dev_tick( &my_xbee);
-    err = xbee_cmd_query_status( &my_xbee);
-  } while (err == -EBUSY);
-  if (err)
-  {
-    printf( "Error %d waiting for query to complete.\n", err);
-  }
-  
-  printf("Initialized XBee AT layer...\n");
-  xbee_dev_dump_settings(&my_xbee, XBEE_DEV_DUMP_FLAG_DEFAULT);
-  
-  printf("Finished running initialization command\n");
+
 }
 
-xbee_serial_t init_serial()
-{
-  // We want to start with a clean slate
-  xbee_serial_t serial;
-  memset(&serial, 0, sizeof serial);
-
-  // Set the baudrate and device ID.
-  serial.baudrate = XBEE_BAJA_BD;
-  strncpy(serial.device, SERIAL_DEVICE_ID, (sizeof serial.device));
-  return serial;
-}

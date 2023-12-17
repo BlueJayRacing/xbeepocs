@@ -6,5 +6,77 @@
 // 3. Initializing the AT layer
 // 4. Confirming that the XBee has the correct setting
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <signal.h>
+#include <unistd.h>
+#include "xbee/device.h"
+#include "xbee/atcmd.h"
+#include "xbee/wpan.h"
 #include "xbee_baja_config.h"
+#include "serial_port_config.h"
+#include "xbee_init_funcs.h"
+#include "platform_config.h"
 
+xbee_serial_t _init_serial()
+{
+  // We want to start with a clean slate
+  xbee_serial_t serial;
+  memset(&serial, 0, sizeof serial);
+
+  // Set the baudrate and device ID.
+  serial.baudrate = XBEE_BAJA_BD;
+  strncpy(serial.device, SERIAL_DEVICE_ID, (sizeof serial.device));
+  return serial;
+}
+
+int _verify_baja_settings(xbee_dev_t *xbee) {
+  // TODO: Use the AT command layer to verify all settings
+  return 0;
+}
+
+int init_baja_xbee(xbee_dev_t *xbee) {
+  xbee_serial_t serial = _init_serial();
+  
+  // Dump state to stdout for debug
+  int err = xbee_dev_init(xbee, &serial, NULL, NULL);
+  if (err)
+  {
+    printf("Error initializing abstraction: %" PRIsFAR "\n", strerror(-err));
+    return EXIT_FAILURE;
+  }
+  printf("Initialized XBee device abstraction.\n");
+  
+  
+  // Need to initialize AT layer so we can transmit
+  err = xbee_cmd_init_device(xbee);
+  if (err)
+  {
+    printf("Error initializing AT layer: %" PRIsFAR "\n", strerror(-err));
+    return EXIT_FAILURE;
+  }
+  do {
+    xbee_dev_tick(xbee);
+    err = xbee_cmd_query_status(xbee);
+  } while (err == -EBUSY);
+  if (err)
+  {
+    printf( "Error %d waiting for AT init to complete.\n", err);
+  }
+  
+  printf("Initialized XBee AT layer\n");
+  xbee_dev_dump_settings(xbee, XBEE_DEV_DUMP_FLAG_DEFAULT);
+  printf("Veryfing XBee settings conform to Baja standard...\n");
+  
+  err = _verify_baja_settings(xbee);
+  if (err)
+  {
+    printf("Xbee settings were not verified\n");
+    return EXIT_FAILURE;
+  }
+  
+  printf("XBee settings conform to Baja standards\n\n");
+  return EXIT_SUCCESS;
+}

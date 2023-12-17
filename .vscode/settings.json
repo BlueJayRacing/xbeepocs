@@ -54,7 +54,9 @@
     "platform_config.h": "c",
     "strings.h": "c",
     "atcmd.h": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "serial_port_config.h": "c",
+    "device.h": "c"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }
