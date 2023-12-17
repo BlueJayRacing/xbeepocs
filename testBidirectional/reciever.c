@@ -30,7 +30,7 @@ char* recieved_msgs[NUM_EXPECTED_MESSAGES] = {NULL};
 char* expected_msgs[NUM_EXPECTED_MESSAGES] = {NULL};
 static volatile sig_atomic_t terminationflag = 0;
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
-    {XBEE_FRAME_RECEIVE_EXPLICIT, 0, receive_handler, NULL},
+    {XBEE_FRAME_RECEIVE, 0, receive_handler, NULL},
     XBEE_FRAME_HANDLE_LOCAL_AT,
     XBEE_FRAME_TABLE_END};
 
@@ -93,6 +93,9 @@ int main(int argc, char **argv)
     usleep(10000);
     // Tick to get TX status updates
     err = xbee_dev_tick(&my_xbee);
+    if (err > 0) {
+      printf("Tick returned %d\n", err);
+    }
     if (terminationflag)
     {
       printf("Recieved SIGINT while waiting ticking device. Exiting\n");
@@ -134,35 +137,42 @@ int main(int argc, char **argv)
 static int receive_handler(xbee_dev_t *xbee, const void FAR *raw,
                            uint16_t frame_len, void FAR *context)
 {
+  
   XBEE_UNUSED_PARAMETER( context);
-  const xbee_frame_receive_explicit_t FAR *frame = raw;
+  const xbee_frame_receive_t FAR *frame = raw;
   
   if (frame == NULL)
   {
+    printf("Recieved null frame\n");
     return -EINVAL;
   }
-  if (frame_len < offsetof( xbee_frame_receive_explicit_t, payload))
+  if (frame_len < offsetof( xbee_frame_receive_t, payload))
   {
-    return -EBADMSG;
-  }
-  if (!(frame->options & XBEE_RX_OPT_BROADCAST))
-  {
-    return -EBADMSG;
-  }
-
-  int payload_len = frame_len - offsetof(xbee_frame_receive_explicit_t, payload);
-  if (frame->payload[payload_len-1] != '\0') {
+    printf("Recieved frame too short\n");
     return -EBADMSG;
   }
   
+  if (!(frame->options & XBEE_RX_OPT_BROADCAST))
+  {
+    printf("Recieved non-broadcast frame\n");
+    return -EBADMSG;
+  }
+
+  int payload_len = frame_len - offsetof(xbee_frame_receive_t, payload);
+  // if (frame->payload[payload_len-1] != '\0') {
+  //   printf("Recieved message not null terminated\n");
+  //   return -EBADMSG;
+  // }
+  
   recieved_msgs[num_msgs_rx] = malloc((payload_len) * sizeof(char));
   if (recieved_msgs[num_msgs_rx] == NULL) {
+    printf("Could not allocate memory for recieved message\n");
     return -ENOMEM;
   }
   
   strncpy(recieved_msgs[num_msgs_rx], (char *) frame->payload, payload_len);
   num_msgs_rx++;
-  printf("Recieved message #%d", num_msgs_rx);
+  printf("Recieved message #%d\n", num_msgs_rx);
   return EXIT_SUCCESS;
 }
 

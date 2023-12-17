@@ -54,6 +54,10 @@ doc
 lib
 coverity
 vscode/
+/testBidirectional/reciever
+/testBidirectional/transmitter
+/testUnidirectionalMultiMsg/looping_transmitter
+/testUnidirectionalSingleMsg/my_transmitter
 
 # auto-generated files
 samples/rabbit/main-node_discovery.c
