@@ -48,8 +48,10 @@ xbee_OBJECTS = $(base_OBJECTS) xbee_device.o xbee_atcmd.o wpan_types.o
 wpan_OBJECTS = $(xbee_OBJECTS) wpan_aps.o xbee_wpan.o
 zigbee_OBJECTS = $(wpan_OBJECTS) zigbee_zcl.o zigbee_zdo.o zcl_types.o
 
+baja_OBJECTS = $(zigbee_OBJECTS) xbee_baja_init.o
+
 # The executables are the only explicit targets we need
-configureXbee : transmitter.o $(zigbee_OBJECTS)
+configureXbee : configureXbee.o $(baja_OBJECTS)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 	
 # Use the dependency files created by the -MD option to gcc.

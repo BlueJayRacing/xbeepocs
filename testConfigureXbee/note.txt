@@ -1,1 +1,0 @@
-The goal of this test is to take a factory-rest Xbee and program it to Baja standards
