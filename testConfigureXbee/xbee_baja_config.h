@@ -2,6 +2,7 @@
 #define XBEE_BAJA_CONFIGS_H
 
 const long XBEE_BAJA_CM = 0x3FFFFFFFFFFFF; // Channel mask
+const int XBEE_BAJA_HP = 0; // Preamble ID
 const int XBEE_BAJA_BD = 921600; // Baud rate
 const int XBEE_BAJA_TX = 2; // Transmission power
 const int XBEE_BAJA_BR = 1; // RF transmission rate

@@ -36,23 +36,45 @@ int _queue_cmd_requests(xbee_dev_t *xbee, int16_t *request) {
   // Queue up the AT commands to verify the settings. Return EXIT_FAILURE
   // if commands could not be queued up
   
-  // while (1)
-  // {
-  //   xbee_cmd_set_command(request, "AF"); // change the cmd handle to create new command
-  //   xbee_cmd_set_param_bytes(request, "???", length - 6); // Set handle paramteres
-  //   error = xbee_cmd_send(request);
-  //   if (error != 0)
-  //   {
-  //     printf("Error %d setting %s\n", error, "AF");
-  //   }
-  // }
+  int err;
+
+  // What firmware settings am I querying?
+  // What paramters need to be set for each?
+  // Where does the response go? Does it go in the dispatch table?
+
+  // Useful commands:
+  // xbee_cmd_set_callback
+  // xbee_cmd_query_device
+
+  
+  // Query channel mask (CM)
+
+
+  // Query Preamble ID (HP)
+  xbee_cmd_set_command(request, "HP"); // change the cmd handle to create new command
+  xbee_cmd_set_param(request, XBEE_BAJA_HP); // Set handle paramteres
+  err = xbee_cmd_send(request);
+  if (err != 0)
+  {
+    printf("Error %d setting %s\n", err, "HP");
+    return EXIT_FAILURE;
+  }
+
+  // Query Baud rate (BD)
+  // Query Transmission power (TX)
+  // Query RF transmission rate (BR)
+  // Query API mode without escapes (AP)
+  // Query Network ID (ID)
+  // Query Number of transmissions per broadcast (MT)
+  // Query Max payload size (NP)
+
   
   return 0;
 }
 
-int _verify_baja_settings(xbee_dev_t *xbee)
+int _write_baja_settings(xbee_dev_t *xbee)
 {
-  /** Verify an XBee has firmware settings that conform
+  /** Write Baja XBee standard firmware settins to the XBee.
    *  to the Baja standard. This function will return none
    *  zero if the XBee does not conform to the standard.
    */
@@ -64,7 +86,7 @@ int _verify_baja_settings(xbee_dev_t *xbee)
     xbee_cmd_send(*request);
     
     // Qeueue the commands
-    int err = _uncleanly_verify_settings(xbee, *request);
+    int err = _queue_cmd_requests(xbee, *request);
     if (err == EXIT_FAILURE) {
       // Do NOT write the queue of commands
       xbee_cmd_release_handle(*request);
