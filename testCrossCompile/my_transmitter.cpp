@@ -3,13 +3,13 @@
 #include <cstring> // Include the cstring library for memset
 
 extern "C" {
+    #include "platform_config.h"
     #include "xbee/device.h"
     #include "xbee/atcmd.h"
     #include "xbee/wpan.h"
-    #include "platform_config.h"
 }
 
-const uint32_t  BAUD_RATE = 115200;
+const uint32_t  BAUD_RATE = 921600;
 const std::string  SERIAL_DEVICE_ID = "/dev/ttyS0";
 const int  MAX_PAYLOAD_SIZE = 100;
 

@@ -58,6 +58,8 @@ vscode/
 /testBidirectional/transmitter
 /testUnidirectionalMultiMsg/looping_transmitter
 /testUnidirectionalSingleMsg/my_transmitter
+/testCrossCompile/my_transmitter
+
 
 # auto-generated files
 samples/rabbit/main-node_discovery.c
