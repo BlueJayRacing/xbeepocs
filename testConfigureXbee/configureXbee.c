@@ -12,6 +12,7 @@
 
 // Global variable. Should define in main.c
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
+    XBEE_FRAME_HANDLE_LOCAL_AT,
     XBEE_FRAME_TABLE_END};
 
 int main(int argc, char **argv)

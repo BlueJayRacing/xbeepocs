@@ -32,13 +32,15 @@ xbee_serial_t _init_serial()
   return serial;
 }
 
-int _queue_cmd_requests(xbee_dev_t *xbee, int16_t *request) {
-  // Queue up the AT commands to verify the settings. Return EXIT_FAILURE
-  // if commands could not be queued up
-  
+
+/**
+ * Queue up the AT commands to verify the settings. Return EXIT_FAILURE
+ * if commands could not be queued up
+*/
+int _queue_baja_cmd_requests(xbee_dev_t* xbee, const int16_t request) {
   int err;
 
-  // What firmware settings am I querying?
+  // What firmware settings am I setting?
   // What paramters need to be set for each?
   // Where does the response go? Does it go in the dispatch table?
 
@@ -59,6 +61,7 @@ int _queue_cmd_requests(xbee_dev_t *xbee, int16_t *request) {
     printf("Error %d setting %s\n", err, "HP");
     return EXIT_FAILURE;
   }
+  printf("Set %s to %d\n", "HP", XBEE_BAJA_HP);
 
   // Query Baud rate (BD)
   // Query Transmission power (TX)
@@ -67,38 +70,38 @@ int _queue_cmd_requests(xbee_dev_t *xbee, int16_t *request) {
   // Query Network ID (ID)
   // Query Number of transmissions per broadcast (MT)
   // Query Max payload size (NP)
-
-  
-  return 0;
+  return EXIT_SUCCESS;
 }
 
+/** Write Baja XBee standard firmware settins to the XBee.
+ *  to the Baja standard. This function will return none
+ *  zero if the XBee does not conform to the standard.
+ */
 int _write_baja_settings(xbee_dev_t *xbee)
 {
-  /** Write Baja XBee standard firmware settins to the XBee.
-   *  to the Baja standard. This function will return none
-   *  zero if the XBee does not conform to the standard.
-   */
-  int16_t* request;
-  *request = xbee_cmd_create(xbee, "AF");
-  if (*request >= 0)
+  const int16_t request = xbee_cmd_create(xbee, "AF");
+  if (request >= 0)
   {
-    xbee_cmd_set_flags(*request, XBEE_CMD_FLAG_QUEUE_CHANGE | XBEE_CMD_FLAG_REUSE_HANDLE);
-    xbee_cmd_send(*request);
+    xbee_cmd_set_flags(request, XBEE_CMD_FLAG_QUEUE_CHANGE | XBEE_CMD_FLAG_REUSE_HANDLE);
     
     // Qeueue the commands
-    int err = _queue_cmd_requests(xbee, *request);
+    int err = _queue_baja_cmd_requests(xbee, request);
     if (err == EXIT_FAILURE) {
       // Do NOT write the queue of commands
-      xbee_cmd_release_handle(*request);
+      xbee_cmd_release_handle(request);
       return EXIT_FAILURE; 
     } 
   }
 
   xbee_cmd_execute(xbee, "WR", NULL, 0);
-  xbee_cmd_release_handle(*request);
+  xbee_cmd_release_handle(request);
   return EXIT_SUCCESS;
 }
 
+
+/**
+ * Initialize an XBee with the Baja standard settings
+*/
 int init_baja_xbee(xbee_dev_t *xbee)
 {
   xbee_serial_t serial = _init_serial();
@@ -133,13 +136,13 @@ int init_baja_xbee(xbee_dev_t *xbee)
   xbee_dev_dump_settings(xbee, XBEE_DEV_DUMP_FLAG_DEFAULT);
   printf("Veryfing XBee settings conform to Baja standard...\n");
 
-  err = _safely_verify_baja_settings(xbee);
+  err = _write_baja_settings(xbee);
   if (err)
   {
     printf("Xbee settings were not verified\n");
     return EXIT_FAILURE;
   }
-
+  xbee_dev_tick(xbee);
   printf("XBee settings conform to Baja standards\n\n");
   return EXIT_SUCCESS;
 }
