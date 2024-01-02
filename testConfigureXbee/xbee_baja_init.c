@@ -40,36 +40,38 @@ xbee_serial_t _init_serial()
 int _queue_baja_cmd_requests(xbee_dev_t* xbee, const int16_t request) {
   int err;
 
-  // What firmware settings am I setting?
-  // What paramters need to be set for each?
-  // Where does the response go? Does it go in the dispatch table?
-
-  // Useful commands:
-  // xbee_cmd_set_callback
-  // xbee_cmd_query_device
+  // TODO: set channel mask (CM), which doesn't have a 32-bit value?
 
   
-  // Query channel mask (CM)
+  // A struct for storing the command title and it's Baja value
+  // Create an array of integer-valued commands to send to the XBee
+  struct cmd {
+    char* name;
+    int value;
+  };
+  struct cmd baja_cmds[] = {
+    {"HP", XBEE_BAJA_HP},
+    {"BD", XBEE_BAJA_BD},
+    {"TX", XBEE_BAJA_TX},
+    {"BR", XBEE_BAJA_BR},
+    {"AP", XBEE_BAJA_AP},
+    {"ID", XBEE_BAJA_ID},
+    {"MT", XBEE_BAJA_MT},
+    {"NP", XBEE_BAJA_NP},
+  };
 
-
-  // Query Preamble ID (HP)
-  xbee_cmd_set_command(request, "HP"); // change the cmd handle to create new command
-  xbee_cmd_set_param(request, XBEE_BAJA_HP); // Set handle paramteres
-  err = xbee_cmd_send(request);
-  if (err != 0)
-  {
-    printf("Error %d setting %s\n", err, "HP");
-    return EXIT_FAILURE;
+  for (int i = 0; i < sizeof baja_cmds / sizeof baja_cmds[0]; i++) {
+    // Set the command
+    xbee_cmd_set_command(request, baja_cmds[i].name); // change the cmd handle to create new command
+    xbee_cmd_set_param(request, baja_cmds[i].value); // Set handle parameters
+    err = xbee_cmd_send(request);
+    if (err != 0)
+    {
+      printf("Error %d setting %s\n", err, baja_cmds[i].name);
+      return EXIT_FAILURE;
+    }
+    printf("Set %s to %d\n", baja_cmds[i].name, baja_cmds[i].value);
   }
-  printf("Set %s to %d\n", "HP", XBEE_BAJA_HP);
-
-  // Query Baud rate (BD)
-  // Query Transmission power (TX)
-  // Query RF transmission rate (BR)
-  // Query API mode without escapes (AP)
-  // Query Network ID (ID)
-  // Query Number of transmissions per broadcast (MT)
-  // Query Max payload size (NP)
   return EXIT_SUCCESS;
 }
 
