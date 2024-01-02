@@ -32,19 +32,19 @@ xbee_serial_t _init_serial()
   return serial;
 }
 
-
-/**
- * Queue up the AT commands to verify the settings. Return EXIT_FAILURE
- * if commands could not be queued up
-*/
-int _queue_baja_cmd_requests(xbee_dev_t* xbee, const int16_t request) {
+/** Write Baja XBee standard firmware settins to the XBee.
+ *  to the Baja standard. This function will return none
+ *  zero if the XBee does not conform to the standard.
+ */
+int _write_baja_settings(xbee_dev_t *xbee)
+{
   int err;
-
   // TODO: set channel mask (CM), which doesn't have a 32-bit value?
 
   
   // A struct for storing the command title and it's Baja value
   // Create an array of integer-valued commands to send to the XBee
+  // TODO: move this into settings header
   struct cmd {
     char* name;
     int value;
@@ -61,42 +61,16 @@ int _queue_baja_cmd_requests(xbee_dev_t* xbee, const int16_t request) {
   };
 
   for (int i = 0; i < sizeof baja_cmds / sizeof baja_cmds[0]; i++) {
-    // Set the command
-    xbee_cmd_set_command(request, baja_cmds[i].name); // change the cmd handle to create new command
-    xbee_cmd_set_param(request, baja_cmds[i].value); // Set handle parameters
-    err = xbee_cmd_send(request);
-    if (err != 0)
-    {
-      printf("Error %d setting %s\n", err, baja_cmds[i].name);
+    do {
+      err = xbee_cmd_simple(xbee, baja_cmds[i].name, baja_cmds[i].value);
+    } while (err == -EBUSY);
+    if (err == -EINVAL) {
+      printf("Error sending %s command. Invalid parameter\n", baja_cmds[i].name);
       return EXIT_FAILURE;
     }
     printf("Set %s to %d\n", baja_cmds[i].name, baja_cmds[i].value);
   }
-  return EXIT_SUCCESS;
-}
-
-/** Write Baja XBee standard firmware settins to the XBee.
- *  to the Baja standard. This function will return none
- *  zero if the XBee does not conform to the standard.
- */
-int _write_baja_settings(xbee_dev_t *xbee)
-{
-  const int16_t request = xbee_cmd_create(xbee, "AF");
-  if (request >= 0)
-  {
-    xbee_cmd_set_flags(request, XBEE_CMD_FLAG_QUEUE_CHANGE | XBEE_CMD_FLAG_REUSE_HANDLE);
-    
-    // Qeueue the commands
-    int err = _queue_baja_cmd_requests(xbee, request);
-    if (err == EXIT_FAILURE) {
-      // Do NOT write the queue of commands
-      xbee_cmd_release_handle(request);
-      return EXIT_FAILURE; 
-    } 
-  }
-
   xbee_cmd_execute(xbee, "WR", NULL, 0);
-  xbee_cmd_release_handle(request);
   return EXIT_SUCCESS;
 }
 
