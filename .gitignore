@@ -59,7 +59,8 @@ vscode/
 /testUnidirectionalMultiMsg/looping_transmitter
 /testUnidirectionalSingleMsg/my_transmitter
 /testCrossCompile/my_transmitter
-/testConfigureXbee/configureXbee
+testConfigureXbee/configureXbee
+
 
 
 # auto-generated files

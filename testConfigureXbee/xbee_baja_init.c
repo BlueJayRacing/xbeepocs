@@ -41,34 +41,15 @@ int _write_baja_settings(xbee_dev_t *xbee)
   int err;
   // TODO: set channel mask (CM), which doesn't have a 32-bit value?
 
-  
-  // A struct for storing the command title and it's Baja value
-  // Create an array of integer-valued commands to send to the XBee
-  // TODO: move this into settings header
-  struct cmd {
-    char* name;
-    int value;
-  };
-  struct cmd baja_cmds[] = {
-    {"HP", XBEE_BAJA_HP},
-    {"BD", XBEE_BAJA_BD},
-    {"TX", XBEE_BAJA_TX},
-    {"BR", XBEE_BAJA_BR},
-    {"AP", XBEE_BAJA_AP},
-    {"ID", XBEE_BAJA_ID},
-    {"MT", XBEE_BAJA_MT},
-    {"NP", XBEE_BAJA_NP},
-  };
-
-  for (int i = 0; i < sizeof baja_cmds / sizeof baja_cmds[0]; i++) {
+  for (int i = 0; i < sizeof XBEE_BAJA_CONFIGS / sizeof XBEE_BAJA_CONFIGS[0]; i++) {
     do {
-      err = xbee_cmd_simple(xbee, baja_cmds[i].name, baja_cmds[i].value);
+      err = xbee_cmd_simple(xbee, XBEE_BAJA_CONFIGS[i].name, XBEE_BAJA_CONFIGS[i].value);
     } while (err == -EBUSY);
     if (err == -EINVAL) {
-      printf("Error sending %s command. Invalid parameter\n", baja_cmds[i].name);
+      printf("Error sending %s command. Invalid parameter\n", XBEE_BAJA_CONFIGS[i].name);
       return EXIT_FAILURE;
     }
-    printf("Set %s to %d\n", baja_cmds[i].name, baja_cmds[i].value);
+    printf("Set %s to %d\n", XBEE_BAJA_CONFIGS[i].name, XBEE_BAJA_CONFIGS[i].value);
   }
   xbee_cmd_execute(xbee, "WR", NULL, 0);
   return EXIT_SUCCESS;
@@ -76,7 +57,7 @@ int _write_baja_settings(xbee_dev_t *xbee)
 
 
 /**
- * Initialize an XBee with the Baja standard settings
+ * Initialize an XBee with the Baja   standard settings
 */
 int init_baja_xbee(xbee_dev_t *xbee)
 {
