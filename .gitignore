@@ -59,10 +59,13 @@ vscode/
 /testUnidirectionalMultiMsg/looping_transmitter
 /testUnidirectionalSingleMsg/my_transmitter
 /testCrossCompile/my_transmitter
-testConfigureXbee/configureXbee
+/testConfigureXbee/configureXbee
 
 
 
 # auto-generated files
 samples/rabbit/main-node_discovery.c
 samples/rabbit/my_config.h
+cmakeTutorial/build/*
+cmakeTutorial/build/*
+testCMakeCompile/build/*
