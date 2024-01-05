@@ -16,10 +16,6 @@ SRCDIR = $(DRIVER)/src
 # Define macros for compilation on POSIX
 DEFINE = \
 	-DPOSIX \
-	-DZCL_ENABLE_TIME_SERVER \
-	-DXBEE_CELLULAR_ENABLED \
-	-DXBEE_DEVICE_ENABLE_ATMODE \
-	-DXBEE_XMODEM_TESTING \
 
 # compiler parameters for building each file
 # -MMD generates dependency files automatically, omitting system files
