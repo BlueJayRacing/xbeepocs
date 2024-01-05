@@ -1,20 +1,17 @@
 cmake_minimum_required(VERSION 3.12)
-project(MyProject VERSION 1.0.0)
+project(Transmitter VERSION 1.0.0)
 
-add_library(
-    xbee STATIC
-    # What do I place here? He used a header and source file,
-    # but I have lots of headers and source files.
-)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+add_executable(my_transmitter my_transmitter.cpp)
 
-add_executable(MyExecutable my_transmitter.cpp)
+# This top-level CMake needs targets declared in the library's CMake, so
+# we use a path to the library's directory
+add_subdirectory(${PROJECT_SOURCE_DIR}/xbee_ansic_library_dir)
 
-target_link_libraries(MyExecutable PRIVATE xbee-include)
+# By linking the xbee_library CMake target against the my_transmitter target,
+# the compiler knows our executable uses code from the library declared in another CMake
+target_link_libraries(my_transmitter PUBLIC xbee_library) 
 
-# Within the build directory
-# cmake ..
-# cmake --build .
-
-
-# We only need to run cmake once, and then we can run "cmake --build ." multiple times
+# Q: How can I reference a library that is not under the PROJECT_SOURCE_DIR?
