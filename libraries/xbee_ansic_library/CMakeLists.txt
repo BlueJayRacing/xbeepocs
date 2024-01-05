@@ -2,7 +2,6 @@
 cmake_minimum_required(VERSION 3.12)
 
 # Project name
-project(xbee_ansic_library)
 set(CMAKE_C_STANDARD 99)
 
 # Add library source files
@@ -70,6 +69,9 @@ set(SOURCES
     src/zigbee/zcl_types.c
     src/zigbee/zigbee_zcl.c
     src/zigbee/zigbee_zdo.c
+    ports/posix/xbee_platform_posix.c 
+    ports/posix/xbee_readline.c 
+    ports/posix/xbee_serial_posix.c
     # Add more source files here
 )
 
@@ -145,16 +147,19 @@ set(HEADERS
     include/zigbee/zcl.h
     include/zigbee/zcl64.h
     include/zigbee/zdo.h
+    ports/posix/platform_config.h
 )
 
 # Create library target
-add_library(xbee_ansic_library ${SOURCES} ${HEADERS})
+add_library(xbee_library STATIC ${SOURCES} ${HEADERS})
 
-target_include_directories(xbee_ansic_library INTERFACE
+# This library has been modified so it is only compatible with POSIX devices
+target_compile_definitions(xbee_library PUBLIC "POSIX")
+target_include_directories(xbee_library PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/ports/posix
 )
 
-target_link_libraries(xbee_ansic_library
+target_link_libraries(xbee_library
     # Add any required libraries here
 )

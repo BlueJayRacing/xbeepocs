@@ -69,3 +69,4 @@ samples/rabbit/my_config.h
 cmakeTutorial/build/*
 cmakeTutorial/build/*
 testCMakeCompile/build/*
+*/*/bin
