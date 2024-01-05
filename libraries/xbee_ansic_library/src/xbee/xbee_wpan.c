@@ -227,7 +227,7 @@ int xbee_frame_dump_transmit_status( xbee_dev_t *xbee,
    XBEE_UNUSED_PARAMETER( length);
    XBEE_UNUSED_PARAMETER( context);
 
-   printf( "%s: id 0x%d to 0x%04x retries=%d del=0x%02x disc=0x%02x\n",
+   printf( "%s: id 0x%02x to 0x%04x retries=%d del=0x%02x disc=0x%02x\n",
       __FUNCTION__, frame->frame_id,
       be16toh( frame->network_address_be), frame->retries, frame->delivery,
       frame->discovery);

@@ -23,8 +23,6 @@
 
 #include "../common/_xbee_term.h"
 
-
-
 struct termios _ttystate_orig;
 void xbee_term_console_restore( void)
 {

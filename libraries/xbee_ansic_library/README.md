@@ -1,5 +1,9 @@
-Digi XBee ANSI C Library
+Digi XBee ANSI C Library - Modified by Tanner Gladson
 ========================
+
+Turned into a CMake library for POSIX devices
+
+=====
 
 The project is a collection of portable ANSI C code for communicating with
 Digi International's [XBee] wireless radio modules in API mode. You will
