@@ -6,10 +6,10 @@ struct cmd {
     const int value;
 };
 
-const long XBEE_BAJA_CM = 0x3FFFFFFFFFFFF; // Channel mask
-const int XBEE_BAJA_BD = 921600; // Channel mask
+static const long XBEE_BAJA_CM = 0x3FFFFFFFFFFFF; // Channel mask
+static const int XBEE_BAJA_BD = 921600; // Channel mask
 
-const struct cmd XBEE_BAJA_CONFIGS[] = {
+static const struct cmd XBEE_BAJA_CONFIGS[] = {
     {"HP", 0},
     {"TX", 2},
     {"BR", 1},
