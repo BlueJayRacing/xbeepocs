@@ -59,12 +59,12 @@ int _write_baja_settings(xbee_dev_t *xbee)
 /**
  * Initialize an XBee with the Baja   standard settings
 */
-int init_baja_xbee(xbee_dev_t *xbee)
+int init_baja_xbee(xbee_dev_t *xbee, const xbee_dispatch_table_entry_t* xbee_frame_handlers)
 {
   xbee_serial_t serial = _init_serial();
 
   // Dump state to stdout for debug
-  int err = xbee_dev_init(xbee, &serial, NULL, NULL);
+  int err = xbee_dev_init(xbee, &serial, NULL, NULL, xbee_frame_handlers);
   if (err)
   {
     printf("Error initializing abstraction: %" PRIsFAR "\n", strerror(-err));

@@ -57,7 +57,9 @@
     "stdlib.h": "c",
     "serial_port_config.h": "c",
     "device.h": "c",
-    "stdint.h": "c"
+    "stdint.h": "c",
+    "xbee_baja_init.h": "c"
   },
-  "C_Cpp.errorSquiggles": "enabled"
+  "C_Cpp.errorSquiggles": "enabled",
+  "cmake.configureOnOpen": false
 }

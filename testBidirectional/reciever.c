@@ -40,7 +40,7 @@ int main(int argc, char **argv)
   xbee_dev_t my_xbee;
 
   // Dump state to stdout for debug
-  int err = xbee_dev_init(&my_xbee, &serial, NULL, NULL);
+  int err = xbee_dev_init(&my_xbee, &serial, NULL, NULL, xbee_frame_handlers);
   if (err)
   {
     printf("Error initializing abstraction: %" PRIsFAR "\n", strerror(-err));

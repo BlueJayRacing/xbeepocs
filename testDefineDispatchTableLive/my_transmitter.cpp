@@ -20,10 +20,12 @@ static int tx_status_handler(xbee_dev_t *xbee, const void FAR *raw,
 
 // Shared Variables
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
-    {XBEE_FRAME_TRANSMIT_STATUS, 0, tx_status_handler, NULL},
-    XBEE_FRAME_TABLE_END};
+        {XBEE_FRAME_TRANSMIT_STATUS, 0, tx_status_handler, NULL},
+        XBEE_FRAME_TABLE_END};
 
 int main() {
+
+    
     int err;
     xbee_serial_t serial = init_serial();
     xbee_dev_t my_xbee;
