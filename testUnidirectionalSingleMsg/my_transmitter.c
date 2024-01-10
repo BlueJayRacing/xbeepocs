@@ -20,7 +20,7 @@ static int tx_status_handler(xbee_dev_t *xbee, const void FAR *raw,
 
 // Shared Variables. NOTE: There are better receive handlers in wpan.h
 static volatile sig_atomic_t terminationflag = 0;
-const xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
+xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
     {XBEE_FRAME_TRANSMIT_STATUS, 0, tx_status_handler, NULL},
     XBEE_FRAME_HANDLE_LOCAL_AT,
     XBEE_FRAME_TABLE_END};
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     xbee_dev_t my_xbee;
 
     // Dump state to stdout for debug
-    err = xbee_dev_init(&my_xbee, &serial, NULL, NULL);
+    err = xbee_dev_init(&my_xbee, &serial, NULL, NULL, xbee_frame_handlers);
     if (err)
     {
         printf("Error initializing device: %" PRIsFAR "\n", strerror(-err));

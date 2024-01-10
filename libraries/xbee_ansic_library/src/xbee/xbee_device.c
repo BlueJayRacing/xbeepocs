@@ -123,7 +123,7 @@ uint8_t xbee_next_frame_id( xbee_dev_t *xbee)
 */
 _xbee_device_debug
 int xbee_dev_init( xbee_dev_t *xbee, const xbee_serial_t *serport,
-                                 xbee_is_awake_fn is_awake, xbee_reset_fn reset, xbee_dispatch_table_entry_t* xbee_frame_handlers_ptr[])
+                                 xbee_is_awake_fn is_awake, xbee_reset_fn reset, xbee_dispatch_table_entry_t *const xbee_frame_handlers_arr)
 {
    int error;
 
@@ -145,7 +145,7 @@ int xbee_dev_init( xbee_dev_t *xbee, const xbee_serial_t *serport,
    memset( xbee, 0, sizeof( xbee_dev_t));
 
    // GLADSON: Added to initialize the frame handlers
-   xbee->xbee_frame_handlers_ptr = xbee_frame_handlers_ptr;
+   xbee->xbee_frame_handlers_arr = xbee_frame_handlers_arr;
 
    // configuration for serial XBee
    xbee->is_awake = is_awake; // function to read XBee's "ON" pin
@@ -930,7 +930,7 @@ int _xbee_frame_dispatch( xbee_dev_t *xbee, const void FAR *frame,
    // we can give each xbee_dev_t context for handling.
 
    dispatched = 0;
-   for (entry = *(xbee->xbee_frame_handlers_ptr); entry->frame_type != 0xFF; ++entry)
+   for (entry = xbee->xbee_frame_handlers_arr; entry->frame_type != 0xFF; ++entry)
    {
       if (! entry->frame_type || entry->frame_type == frametype)
       {

@@ -2,7 +2,7 @@
 CC ?= gcc
 
 # Path to Digi XBee ANSI library
-XBEE_LIBRARY_DIR = /home/pi/xbeepocs/libraries/xbee_ansic_library
+XBEE_LIBRARY_DIR = ../libraries/xbee_ansic_library
 PORT = posix
 
 # Port and driver config
