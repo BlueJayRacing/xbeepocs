@@ -70,3 +70,4 @@ cmakeTutorial/build/*
 cmakeTutorial/build/*
 testCMakeCompile/build/*
 */*/bin
+**/xbee_ansic_library_old/

@@ -1,7 +1,7 @@
 Digi XBee ANSI C Library - Modified by Tanner Gladson
 ========================
 
-Turned into a CMake library for POSIX devices
+Converted into a CMake library for use exclusively with POSIX systems.
 
 =====
 
@@ -19,15 +19,6 @@ It currently supports the following platforms:
 
 - POSIX operating systems (Windows with [Cygwin] or [MSYS2], Mac OS X, Linux,
   BSD) with gcc
-- Windows with [MinGW] or [Mingw-w64] and gcc
-- Digi International embedded hardware platforms that use [libdigiapix] to
-  control GPIO pins
-- DOS using the [OpenWatcom] compiler
-- Rabbit-brand microprocessors (using [Dynamic C] 10.70 or later)
-- Freescale HCS08 with CodeWarrior 10.x (part of [Programmable XBee Dev Kit])
-- Freescale FRDM-KL25Z with [mbed.org] compiler (limited support at this time)
-- [Silicon Labs] SLSTK3701A Starter Kit with Gecko SDK Suite v1.1.1 or later
-  with optional Micrium OS support
 
 It provides an API for a host platform that communicates with an XBee radio
 serially.  Some of the features include:
