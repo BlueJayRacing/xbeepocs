@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <signal.h>
 #include "xbee/device.h"
 #include "xbee/atcmd.h"
 #include "xbee/wpan.h"
@@ -14,12 +13,10 @@ int const MAX_PAYLOAD_SIZE = 100;
 
 // Local Functions
 xbee_serial_t init_serial();
-static void sigterm(int sig);
 static int tx_status_handler(xbee_dev_t *xbee, const void FAR *raw,
                       uint16_t length, void FAR *context);                        
 
 // Shared Variables. NOTE: There are better receive handlers in wpan.h
-static volatile sig_atomic_t terminationflag = 0;
 xbee_dispatch_table_entry_t xbee_frame_handlers[] = {
     {XBEE_FRAME_TRANSMIT_STATUS, 0, tx_status_handler, NULL},
     XBEE_FRAME_HANDLE_LOCAL_AT,
@@ -41,13 +38,6 @@ int main(int argc, char **argv)
     }
     printf("Initialized XBee device abstraction...\n");
     xbee_dev_dump_settings(&my_xbee, XBEE_DEV_DUMP_FLAG_DEFAULT);
-
-    // Create graceful SIGINT handler
-    if (signal(SIGTERM, sigterm) == SIG_ERR || signal(SIGINT, sigterm) == SIG_ERR)
-    {
-        printf("Error setting signal handler\n");
-        return EXIT_FAILURE;
-    }
 
     char payload[] = "First payload!\r\n";
     xbee_header_transmit_explicit_t frame_out_header = {
@@ -87,11 +77,6 @@ int main(int argc, char **argv)
             printf("Read a frame from the XBee!\n");
             return EXIT_SUCCESS;
         }
-        if (terminationflag)
-        {
-            printf("Recieved SIGINT while waiting ticking device. Exiting\n");
-            return EXIT_FAILURE;
-        }
         if (err < 0)
         {
             printf("ERROR: Could not tick device: %" PRIsFAR "\n", strerror(-err));
@@ -109,12 +94,6 @@ int tx_status_handler(xbee_dev_t *xbee,
   XBEE_UNUSED_PARAMETER(context);
   printf("TX Status: id %d, delivery=0x%02x\n", frame->frame_id, frame->delivery);
   return 0;
-}
-
-static void sigterm(int sig)
-{
-    signal(sig, sigterm);
-    terminationflag = 1;
 }
 
 xbee_serial_t init_serial()
