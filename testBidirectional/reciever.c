@@ -11,7 +11,7 @@
 
 #define MAX_PAYLOAD_SIZE 100
 #define NUM_EXPECTED_MESSAGES 50
-#define BAUD_RATE 115200
+#define BAUD_RATE 921600
 #define SERIAL_DEVICE_ID "/dev/ttyS0"
 #define TEST_MESSAGES_SRC "random_text.txt"
 

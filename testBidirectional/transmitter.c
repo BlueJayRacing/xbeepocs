@@ -9,7 +9,7 @@
 #include "xbee/wpan.h"
 #include "platform_config.h"
 
-uint32_t BAUD_RATE = 115200;
+uint32_t BAUD_RATE = 921600;
 char SERIAL_DEVICE_ID[] = "/dev/ttyS0";
 int const MAX_PAYLOAD_SIZE = 100;
 char TEST_MESSAGES_SRC[] = "random_text.txt";
