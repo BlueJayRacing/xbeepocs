@@ -9,8 +9,8 @@ add_executable(my_transmitter my_transmitter.cpp)
 # This top-level CMake needs targets declared in the library's CMake, so
 # we use a path to the library's directory
 add_subdirectory(
-    /home/pi/xbeepocs/libraries/xbee_ansic_library
-    /home/pi/xbeepocs/libraries/xbee_ansic_library/bin
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/xbee_ansic_library
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/xbee_ansic_library/bin
     )
 
 # By linking the xbee_library CMake target against the my_transmitter target,
